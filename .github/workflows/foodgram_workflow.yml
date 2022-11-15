@@ -23,7 +23,7 @@ jobs:
           mkdir -p foodgram/
 
     - name: Copy files
-      uses: GrebenchukEvgeniy/github-action-scp@release
+      uses: garygrossgarten/github-action-scp@release
       with:
           local: infra/
           remote: /home/${{ secrets.USER }}/foodgram/
