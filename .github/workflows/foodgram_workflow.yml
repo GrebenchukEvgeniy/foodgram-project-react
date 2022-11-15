@@ -21,8 +21,9 @@ jobs:
         script: |
           sudo rm -rf foodgram/
           mkdir -p foodgram/
+
     - name: Copy files
-      uses: buddaru/github-action-scp@release
+      uses: GrebenchukEvgeniy/github-action-scp@release
       with:
           local: infra/
           remote: /home/${{ secrets.USER }}/foodgram/
