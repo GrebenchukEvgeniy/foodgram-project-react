@@ -4,7 +4,7 @@ on:
   push:
     branches: [ master ]
 
-# jobs:
+jobs:
 #   copy_infra_to_server:
 #     name: Copy docker-compose.yml and nginx.conf
 #     runs-on: ubuntu-latest
