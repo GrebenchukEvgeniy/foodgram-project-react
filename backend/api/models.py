@@ -104,9 +104,10 @@ class Recipe(models.Model):
         help_text='Введите описание рецепта',
     )
     ingredients = models.ManyToManyField(
-        'AmountIngredient',
+        'Ingredient',
         related_name='recipes',
         verbose_name='Ингредиенты',
+        through='AmountIngredient',
         help_text='Выберите ингредиенты для рецепта',
     )
     tags = models.ManyToManyField(
@@ -122,11 +123,11 @@ class Recipe(models.Model):
             'Время приготовления не может быть меньше одной минуты'
         )],
     )
-    is_favorited = models.BooleanField('В избранном', default=False)
-    is_in_shopping_cart = models.BooleanField(
-        'В списке покупок',
-        default=False
-    )
+    # is_favorited = models.BooleanField('В избранном', default=False)
+    # is_in_shopping_cart = models.BooleanField(
+    #     'В списке покупок',
+    #     default=False
+    # )
     pub_date = models.DateTimeField(
         auto_now_add=True,
         verbose_name='Дата публикации',
@@ -163,6 +164,13 @@ class AmountIngredient(models.Model):
     class Meta:
         verbose_name = 'Количество ингредиента'
         verbose_name_plural = 'Количество ингредиентов'
+        constraints = (
+            models.UniqueConstraint(
+                fields=('ingredient'),
+                name='unique_ingredients'
+            ),
+        )
+
 
     def __str__(self):
         return f'{self.amount} {self.ingredient}'
