@@ -161,10 +161,9 @@ class CreateUpdateRecipeSerializer(serializers.ModelSerializer):
         instance.save()
         ingredients_list = []
         for ingredient in ingredients:
-            ingredient_amount, status = (
-                AmountIngredient.objects.get_or_create(**ingredient)
-            )
-            ingredients_list.append(ingredient_amount)
+            ingredients_list.append(AmountIngredient(ingredient=get_object_or_404(
+                Ingredient,id = ingredient['id']), amount=ingredient['amount']))
+        AmountIngredient.objects.bulk_create(ingredients_list)
         instance.ingredients.set(ingredients_list)
         instance.tags.set(tags)
         return instance
