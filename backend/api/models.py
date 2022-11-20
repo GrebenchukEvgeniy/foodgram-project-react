@@ -123,11 +123,6 @@ class Recipe(models.Model):
             'Время приготовления не может быть меньше одной минуты'
         )],
     )
-    # is_favorited = models.BooleanField('В избранном', default=False)
-    # is_in_shopping_cart = models.BooleanField(
-    #     'В списке покупок',
-    #     default=False
-    # )
     pub_date = models.DateTimeField(
         auto_now_add=True,
         verbose_name='Дата публикации',
@@ -151,6 +146,12 @@ class AmountIngredient(models.Model):
         verbose_name='Ингредиент',
         related_name='ingredients_amount',
     )
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE,
+        verbose_name='Рецепт',
+        related_name='ingredients_amount',
+    )
     amount = models.PositiveIntegerField(
         verbose_name='Количество ингредиента',
         default=0,
@@ -166,7 +167,7 @@ class AmountIngredient(models.Model):
         verbose_name_plural = 'Количество ингредиентов'
         constraints = (
             models.UniqueConstraint(
-                fields=('ingredient'),
+                fields=('ingredient', 'recipe'),
                 name='unique_ingredients'
             ),
         )

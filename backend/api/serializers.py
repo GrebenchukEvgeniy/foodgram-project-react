@@ -28,10 +28,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     def get_is_subscribed(self, obj):
         """ Проверка подписки пользователя"""
-
         request = self.context.get('request')
-        # if request is None or request.user.is_anonymous:
-        #     return False
         return Follow.objects.filter(
             user=request.user,
             author=obj.id).exists()
@@ -60,21 +57,11 @@ class IngredientsAmountSerializer(serializers.ModelSerializer):
     )
     name = serializers.ReadOnlyField(source='ingredient.name')
     measurement_unit = serializers.ReadOnlyField(source='ingredient.measurement_unit')
-    # name = serializers.SerializerMethodField(read_only=True)
-    # measurement_unit = serializers.SerializerMethodField(read_only=True)
+
 
     class Meta:
         model = AmountIngredient
         fields = ('id', 'name', 'measurement_unit', 'amount')
-
-    def _get_ingredient(self, ingredient_id):
-        return get_object_or_404(Ingredient, id=ingredient_id)
-
-    # def get_name(self, amount):
-    #     return self._get_ingredient(amount.ingredient.id).name
-
-    # def get_measurement_unit(self, amount):
-    #     return self._get_ingredient(amount.ingredient.id).measurement_unit
 
 
 class ListRecipeSerializer(serializers.ModelSerializer):
@@ -95,7 +82,6 @@ class ListRecipeSerializer(serializers.ModelSerializer):
         fields = ('id', 'tags', 'author', 'ingredients', 'is_favorited',
                   'is_in_shopping_cart', 'name', 'image', 'text',
                   'cooking_time')
-        # read_only_fields = ('author', 'tags',)
 
     def get_is_favorited(self, obj):
         request = self.context.get('request')
@@ -153,10 +139,9 @@ class CreateUpdateRecipeSerializer(serializers.ModelSerializer):
         recipe = Recipe.objects.create(image=image, **validated_data)
         ingredients_list = []
         for ingredient in ingredients:
-            ingredient_amount, status = (
-                AmountIngredient.objects.get_or_create(**ingredient)
-            )
-            ingredients_list.append(ingredient_amount)
+            ingredients_list.append(AmountIngredient(recipe=recipe, ingredient=get_object_or_404(
+                Ingredient,id = ingredient['id']), amount=ingredient['amount']))
+        AmountIngredient.objects.bulk_create(ingredients_list)
         recipe.ingredients.set(ingredients_list)
         recipe.tags.set(tags)
         return recipe
