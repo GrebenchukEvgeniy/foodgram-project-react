@@ -56,8 +56,8 @@ class IngredientsAmountSerializer(serializers.ModelSerializer):
         source='ingredient'
     )
     name = serializers.ReadOnlyField(source='ingredient.name')
-    measurement_unit = serializers.ReadOnlyField(source='ingredient.measurement_unit')
-
+    measurement_unit = serializers.ReadOnlyField(
+        source='ingredient.measurement_unit')
 
     class Meta:
         model = AmountIngredient
@@ -139,8 +139,10 @@ class CreateUpdateRecipeSerializer(serializers.ModelSerializer):
         recipe = Recipe.objects.create(image=image, **validated_data)
         ingredients_list = []
         for ingredient in ingredients:
-            ingredients_list.append(AmountIngredient(recipe=recipe, ingredient=get_object_or_404(
-                Ingredient,id = ingredient['id']), amount=ingredient['amount']))
+            ingredients_list.append(AmountIngredient(
+                recipe=recipe, ingredient=get_object_or_404(
+                    Ingredient, id=ingredient['id']),
+                amount=ingredient['amount']))
         AmountIngredient.objects.bulk_create(ingredients_list)
         recipe.ingredients.set(ingredients_list)
         recipe.tags.set(tags)
@@ -161,8 +163,9 @@ class CreateUpdateRecipeSerializer(serializers.ModelSerializer):
         instance.save()
         ingredients_list = []
         for ingredient in ingredients:
-            ingredients_list.append(AmountIngredient(ingredient=get_object_or_404(
-                Ingredient,id = ingredient['id']), amount=ingredient['amount']))
+            ingredients_list.append(AmountIngredient(
+                ingredient=get_object_or_404(Ingredient, id=ingredient['id']),
+                amount=ingredient['amount']))
         AmountIngredient.objects.bulk_create(ingredients_list)
         instance.ingredients.set(ingredients_list)
         instance.tags.set(tags)
