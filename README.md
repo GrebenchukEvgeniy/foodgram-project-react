@@ -1,6 +1,6 @@
 #  foodgram-project-react
 #  IP 62.84.113.207
-![example workflow](https://github.com/GrebenchukEvgeniy/foodgram-project-react/actions/workflows/foodgram_workflow.yml/badge.svg)
+![example workflow](https://github.com/GrebenchukEvgeniy/foodgram-project-react/actions/workflows/main.yml/badge.svg)
 
 # Описание. 
 
