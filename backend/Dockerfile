@@ -1,6 +1,11 @@
-FROM python:3.9-slim
+FROM python:3.8.6-slim
 
-WORKDIR /app
+WORKDIR /backend
+
 COPY . .
-RUN pip install --upgrade pip && pip install -r requirements.txt
-CMD gunicorn foodgram.wsgi:application --bind 0.0.0.0:8000
+
+RUN apt-get update && apt-get install gcc libpq-dev -y
+RUN python3 -m pip install --upgrade pip
+RUN pip install -r requirements.txt --no-cache-dir
+
+CMD ["gunicorn", "foodgram.wsgi:application", "--bind", "0:8000"]

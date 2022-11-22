@@ -6,17 +6,11 @@ load_dotenv()
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-SECRET_KEY = os.getenv('SECRET_KEY'),
+SECRET_KEY = os.getenv('SECRET_KEY', default="key")
 
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = [
-    'localhost',
-    '127.0.0.1',
-    '*',
-    '158.160.44.203',
-    'web',
-]
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', default='*, localhost').split(', ')
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -25,12 +19,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'users',
+    'recipes',
     'rest_framework',
     'rest_framework.authtoken',
     'djoser',
     'django_filters',
-    'users',
-    'api',
+    'django_cleanup',
 ]
 
 MIDDLEWARE = [
@@ -63,27 +58,14 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'foodgram.wsgi.application'
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': config('DB_ENGINE', default='django.db.backends.postgresql'),
-#         'NAME': config('DB_NAME', default='foodgram'),
-#         'USER': config('POSTGRES_USER', default='postgres'),
-#         'PASSWORD': config('POSTGRES_PASSWORD'),
-#         'HOST': config('DB_HOST', default='db'),
-#         'PORT': config('DB_PORT', default=5432),
-#     }
-# }
 DATABASES = {
     'default': {
-        'ENGINE': os.getenv(
-            'DB_ENGINE',
-            default='django.db.backends.postgresql'
-        ),
+        'ENGINE': os.getenv('DB_ENGINE', default='django.db.backends.postgresql'),
         'NAME': os.getenv('DB_NAME', default='postgres'),
         'USER': os.getenv('POSTGRES_USER', default='postgres'),
-        'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD', default='postgres'),
         'HOST': os.getenv('DB_HOST', default='db'),
-        'PORT': os.getenv('DB_PORT', default=5432),
+        'PORT': os.getenv('DB_PORT', default='5432'),
     }
 }
 
@@ -112,6 +94,7 @@ USE_L10N = True
 
 USE_TZ = True
 
+AUTH_USER_MODEL = 'users.User'
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
@@ -119,49 +102,29 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-AUTH_USER_MODEL = "users.CustomUser"
-
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
     ],
-
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
     ],
-
-    'DEFAULT_FILTER_BACKENDS': [
-        'django_filters.rest_framework.DjangoFilterBackend'
-    ],
-    'DEFAULT_PAGINATION_CLASS':
-        'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 6
 }
 
-# DJOSER = {
-#     'LOGIN_FIELD': 'email',
-#     'HIDE_USERS': False,
-#     'PERMISSIONS': {
-#         'resipe': ('api.permissions.AuthorStaffOrReadOnly',),
-#         'recipe_list': ('api.permissions.AuthorStaffOrReadOnly',),
-#         'user': ('api.permissions.IsOwnerOrAdminOrReadOnly',),
-#         'user_list': ('api.permissions.IsOwnerOrAdminOrReadOnly',),
-#     },
-#     'SERIALIZERS': {
-#         'user': 'api.serializers.UserSerializer',
-#         'user_list': 'api.serializers.UserSerializer',
-#         'current_user': 'api.serializers.UserSerializer',
-#         'user_create': 'api.serializers.UserSerializer',
-#     },
-# }
 DJOSER = {
     'LOGIN_FIELD': 'email',
-    'PASSWORD_RESET_CONFIRM_URL': 'users/reset_password/{uid}/{token}',
-    'USERNAME_RESET_CONFIRM_URL': 'users/reset_email/{uid}/{token}',
-    'ACTIVATION_URL': 'users/activation/{uid}/{token}',
+    'HIDE_USERS': False,
     'SERIALIZERS': {
-        'user': 'users.serializers.CustomUserSerializer',
         'user_create': 'users.serializers.CustomUserCreateSerializer',
-        'set_password': 'users.serializers.CustomSetPasswordSerializer',
+        'user': 'users.serializers.CustomUserSerializer',
+        'current_user': 'users.serializers.CustomUserSerializer',
     },
+    'PERMISSIONS': {
+        'user': ('rest_framework.permissions.IsAuthenticated',),
+        'user_list': ('rest_framework.permissions.AllowAny',)
+    }
 }
+
+DATA_ROOT = os.path.join(BASE_DIR, 'data')
+
+VALUE_DISPLAY = '-пусто-'
